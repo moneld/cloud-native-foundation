@@ -78,6 +78,30 @@ du navigateur pour valider tous les services HTTPS du lab sans warning.
 | `selfsigned-bootstrap` | Self-signed | Émet la CA racine, rien d'autre |
 | `lab-ca`               | CA          | Émet les certs applicatifs      |
 
+## Test rapide
+
+```bash
+# Vérifier les ClusterIssuer
+kubectl get clusterissuer
+# selfsigned-bootstrap et lab-ca doivent être READY=True
+
+# Vérifier le Certificate de la CA
+kubectl get certificate -n cert-manager
+# lab-ca doit être READY=True
+
+# Inspecter la CA racine
+kubectl get secret lab-ca-secret -n cert-manager \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d \
+  | openssl x509 -text -noout | grep -A1 "Basic Constraints"
+# Doit afficher CA:TRUE
+
+# Importer la CA dans le système (Ubuntu/Debian)
+kubectl get secret lab-ca-secret -n cert-manager \
+  -o jsonpath='{.data.tls\.crt}' | base64 -d \
+  | sudo tee /usr/local/share/ca-certificates/lab-ca.crt
+sudo update-ca-certificates
+```
+
 ### Sur EKS
 
 Sur EKS, le ClusterIssuer `lab-ca` sera remplacé par un ClusterIssuer ACME

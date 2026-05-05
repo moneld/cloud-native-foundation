@@ -144,6 +144,16 @@ fait le même mapping `80:8000` vers les pods Traefik. Elle évite aussi
 de devoir donner au pod Traefik la capability `NET_BIND_SERVICE` pour
 binder sur des ports < 1024.
 
+## HTTPS
+
+Le Gateway expose un listener HTTPS sur le port externe 443 (interne 8443).
+Le certificat utilisé est `demo-tls-secret`, émis par cert-manager via le
+ClusterIssuer `lab-ca`.
+
+Tous les certs applicatifs partagent la même CA racine. Un seul import
+dans le trust store du système permet de valider tous les services
+HTTPS du lab sans `curl -k`.
+
 ## Sur EKS
 
 Sur EKS :

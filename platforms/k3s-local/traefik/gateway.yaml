@@ -12,3 +12,15 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: https
+      protocol: HTTPS
+      port: 8443 # port interne entryPoint websecure (pas 443)
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: demo-tls-secret
+            kind: Secret
+            group: ""
+      allowedRoutes:
+        namespaces:
+          from: All

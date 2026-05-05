@@ -1,0 +1,61 @@
+# Activer le provider Gateway API et désactiver l'IngressRoute legacy
+providers:
+  kubernetesGateway:
+    enabled: true
+  kubernetesIngress:
+    enabled: false
+  kubernetesCRD:
+    enabled: false
+
+# Désactiver les CRDs propres à Traefik (IngressRoute, Middleware...)
+# On utilise exclusivement Gateway API
+ingressRoute:
+  dashboard:
+    enabled: false
+
+# Les ports d'entrée de Traefik
+ports:
+  web:
+    port: 8000
+    expose:
+      default: true
+    exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    expose:
+      default: true
+    exposedPort: 443
+    protocol: TCP
+
+# Service exposé en LoadBalancer (MetalLB lui donnera une IP)
+service:
+  enabled: true
+  type: LoadBalancer
+
+# Permettre à Traefik de gérer les Gateway dans tous les namespaces
+# (par défaut Helm chart de Traefik installe la ServiceAccount avec les bons droits)
+rbac:
+  enabled: true
+
+# Logs en JSON pour Loki plus tard
+logs:
+  general:
+    format: json
+    level: INFO
+  access:
+    enabled: true
+    format: json
+
+# Métriques Prometheus (utiles plus tard pour kube-prometheus-stack)
+metrics:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: false # on activera quand kube-prometheus-stack sera installé
+
+# Installer la GatewayClass nommée "traefik"
+# C'est l'objet qui dit "tel Gateway sera géré par Traefik"
+experimental:
+  kubernetesGateway:
+    enabled: true

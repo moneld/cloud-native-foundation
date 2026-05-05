@@ -1,0 +1,44 @@
+# Le serveur ArgoCD (UI + API)
+server:
+  # On désactive le TLS interne d'ArgoCD car Traefik termine le TLS pour nous.
+  # Sans ça, on aurait du double-TLS et ArgoCD redirigerait HTTP→HTTPS dans une boucle.
+  extraArgs:
+    - --insecure
+
+  # Pas de Service LoadBalancer ici : Traefik (Gateway API) sera notre point d'entrée.
+  service:
+    type: ClusterIP
+
+  # Métriques Prometheus (utiles plus tard)
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false # à activer quand kube-prometheus-stack sera là
+
+# Le controller (la partie qui synchronise les Applications)
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+
+# Le repo server (la partie qui clone les repos Git et template les manifests)
+repoServer:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false
+
+# ApplicationSet controller (utile plus tard pour multi-env)
+applicationSet:
+  enabled: true
+
+# Notifications (off pour l'instant, à activer plus tard si besoin)
+notifications:
+  enabled: false
+
+# Configuration globale
+configs:
+  params:
+    # Serveur en mode insecure (TLS terminé par Traefik en amont)
+    server.insecure: true

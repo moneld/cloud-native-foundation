@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-self
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/moneld/cloud-native-foundation
+    targetRevision: main
+    path: platforms/k3s-local/argocd
+    # On utilise Helm dans cette source, avec les valeurs values.yaml
+    helm:
+      valueFiles:
+        - values.yaml
+      releaseName: argocd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: false # ne PAS supprimer ArgoCD si on retire l'app !
+      selfHeal: true # ramener au state Git si quelqu'un fait kubectl edit
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true

@@ -21,6 +21,9 @@ spec:
           - name: demo-tls-secret
             kind: Secret
             group: ""
+          - name: argocd-tls-secret
+            kind: Secret
+            group: ""
       allowedRoutes:
         namespaces:
           from: All
